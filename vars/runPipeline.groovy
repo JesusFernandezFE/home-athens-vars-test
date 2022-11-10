@@ -48,19 +48,19 @@ def call(Map params) {
 				}
 			}
 
-			stage('Generate VS Projects') {
-				when { expression { return PIPELINE_REQUIRES_BUILD_STEPS } }
-				steps {
-					generateVSProjects()
-				}
-			}
+			// stage('Generate VS Projects') {
+			// 	when { expression { return PIPELINE_REQUIRES_BUILD_STEPS } }
+			// 	steps {
+			// 		generateVSProjects()
+			// 	}
+			// }
 
-			stage('Build VS Projects') {
-				when { expression { return PIPELINE_REQUIRES_BUILD_STEPS } }
-				steps {
-					buildVSProjects(params)						
-				}
-			}
+			// stage('Build VS Projects') {
+			// 	when { expression { return PIPELINE_REQUIRES_BUILD_STEPS } }
+			// 	steps {
+			// 		buildVSProjects(params)						
+			// 	}
+			// }
 
 			stage('Run Post-Build Scripts')
 			{
