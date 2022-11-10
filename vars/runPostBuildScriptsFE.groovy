@@ -137,32 +137,15 @@ def uploadBuildToSteam(String config)
 {  
 	echo ">>> Running Post-Build Script: uploadBuildToSteam(), config: '${config}'"
 
-	if(BUILD_PLATFORM != 'Steam') {
-		echo ">>> ERROR: Trying to run 'uploadBuildToSteam()' script on platform '${BUILD_PLATFORM}'"
-		return
-	}
-
-	if(config.isEmpty()) {
-		// Shouldn't be able to get here with an empty config param, but checking just in case...
-		echo ">>> ERROR: Cannot run 'uploadBuildToSteam()' script without a Config specified"
-		return
-	}
-
-			echo '''
-					cd "E:\\Athens\\Scripts\\Steam"
-					set PASSWORD=fe_build_machine001"
-					set USER="Build2ExtraHouses"
+	withEnv(['P4_CL=${P4_CHANGELIST}'])
+	{
+				bat '''
+					cd "E:\\Athens\\Source\\extlib\\steam\\steamworks_sdk_142\\tools\\ContentBuilder\\builder"
+					steamcmd.exe +login "fe_build_machine001" "Build2ExtraHouses" +run_app_build "E:\\Athens\\Scripts\\Steam\\app_build.vdf" +quit" 					
 				'''
+	}
 
-			bat '''
-				cd "E:\\Athens\\Scripts\\Steam"
-				set PASSWORD="fe_build_machine001"
-				set USER="Build2ExtraHouses"
-
-				FE_steam.bat 
-	'''
 }
-
 
 
 def clearShaderCache()
