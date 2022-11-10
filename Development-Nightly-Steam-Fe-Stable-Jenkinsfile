@@ -3,7 +3,7 @@
 @Library('athens-lib')
 def params = [
 	// --- Mandatory params: --- (these MUST be included and set for every pipeline) 
-	workspace: 'EXT_FE_Jesus-desktop_Jenkins',
+	workspace: 'EXT_FE_Jesus--Home-Athens',
 	stream: 'FE_stable',
 	targets: [
 
