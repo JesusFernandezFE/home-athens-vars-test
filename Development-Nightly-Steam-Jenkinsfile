@@ -1,0 +1,82 @@
+// These params determine all variable pipeline functionality, eg: which Stream to sync, which build configs 
+// to build, which pre- and post-build scripts to run, which tests to run after a successful build, etc
+
+import static athens.utils.GlobalParams.*
+import static athens.utils.UtilityFunctions.*
+
+
+def params = [
+
+	// --- Mandatory params: --- (these MUST be included and set for every pipeline) 
+
+	workspace:	'BuildFarm_MEL1-BM-001_Athens_Development',
+	stream: 	'development',
+	targets: [
+				[
+					target: 				'Athens\\athens',
+					platforms: 				[ 'Steam' ],
+					configs: 				[ 'Playtest' ],
+					runPreBuildScripts: 	[ 
+												fullClean: true,
+												clearShaderCache: true
+											],
+					runPostBuildScripts:	[
+												testBuildShaderCache: ['Steam', 'Playtest'],	// CYPH TODO: REMOVE CONFIG OPTIONS
+										//		runStabilityTest: ['Steam', 'Playtest'],		// CYPH TODO: REMOVE CONFIG OPTIONS
+												runTestHarnessTests: ['Steam', 'Playtest'],		// CYPH TODO: REMOVE CONFIG OPTIONS
+												buildTextureCache: true,
+												buildModelCache: true,
+												copyBuildFilesToOutDir: true,
+												packageBuild: true,
+												signExecutables: true,
+												uploadBuildToSteamConfig: "Playtest",
+												uploadArtifacts: true
+											]
+				],
+				[
+					target: 	'Tools\\TMExport',
+					platforms: 	['Steam'],
+					configs: 	['Playtest'],
+				],
+				[
+					target: 	'Tools\\TMModelViewer',
+					platforms: 	['Steam'],
+					configs: 	['Playtest'],
+				],
+				[
+					target: 	'Tools\\BarMixer',
+					platforms: 	['Steam'],
+					configs: 	['Playtest'],
+				],
+			],
+
+	// --- Optional params: --- (if not included, these params default to 'false')
+
+	runTestHarnessTestSets: [ 'BasicCheckInTestSet' ],
+	testHarnessParams:  	[
+								AbortOnTestSetFormatError: 	false,
+								AbortOnFirstTestFail: 		false,
+								ShowTestHarnessDebugPrints: true
+							],
+
+	runSlackReporting: 	true,
+	slackParams:		[	
+							Channel: '#athens-jenkins-notifications',
+							NotifySuccess: true,
+							NotifyAborted: false,
+							NotifyNotBuilt: false,
+							NotifyUnstable: false,
+							NotifyRegression: true,
+							NotifyEveryFail: true,
+							NotifyBackToNorm:false,	
+							NotifyFirstFailureOnly: false,
+							IncludeTestSummary: true
+			 			]
+]
+
+
+// The following library function runs the actual pipeline, stepping through each stage and 
+// executing any functionality determined by the pipeline params (declared above)
+
+runPipeline(params);
+

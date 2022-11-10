@@ -1,0 +1,54 @@
+// These params determine all variable pipeline functionality, eg: which Stream to sync, which build configs 
+// to build, which pre- and post-build scripts to run, which tests to run after a successful build, etc
+@Library('athens-lib')
+def params = [
+	// --- Mandatory params: --- (these MUST be included and set for every pipeline) 
+	workspace: 'EXT_FE_Jesus-desktop_Jenkins',
+	stream: 'FE_stable',
+	targets: [
+
+		[
+			target: 'Athens\\Build',
+			configs: ['Playtest'],
+			platforms: ['Steam'],
+					runPreBuildScripts: 	[ fullClean: true ],
+
+					runPostBuildScripts:	[
+						testBuildShaderCache: ['Steam', 'Playtest'],												
+						buildTextureCache: true,
+						buildModelCache: true,
+						copyBuildFilesToOutDir: true,
+						packageBuild: true,
+						signExecutables: false,
+						uploadBuildToSteamConfig: "Playtest"
+					],
+		],
+		[
+			target: 'Tools\\TMExport',
+			configs: ['Playtest'],
+			platforms: ['Steam'],						  
+		],
+		[  
+			target: 'Tools\\TMModelViewer',
+			configs: ['Playtest'],
+			platforms: ['Steam'],						  
+		],
+		[
+			target: 'Tools\\BarMixer',
+			configs: ['Playtest'],
+			platforms: ['Steam'],						  
+		]
+
+	],
+	
+	// --- Optional params: --- (if not included, these params default to 'false')
+
+	runPreBuildScripts: 	[:],
+	runPostBuildScripts: 	[:],
+	NotifyConf: false,
+]
+
+// The following library function runs the actual pipeline, stepping through each stage and 
+// executing any functionality determined by the pipeline params (declared above)
+
+runPipeline(params);

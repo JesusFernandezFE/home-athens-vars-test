@@ -1,0 +1,91 @@
+
+import static athens.utils.GlobalParams.*
+import static athens.utils.UtilityFunctions.*
+
+
+def params = [
+	workspace: 'BuildFarm_MEL1-BM-001_Athens_Development',
+	stream: 'development',
+
+	runSlackReporting: true,
+	slackParams: [	
+				Channel: '#athens-jenkins-notifications-secondary',
+				NotifySuccess: true,
+				NotifyAborted: false,
+				NotifyNotBuilt: false,
+				NotifyUnstable: false,
+				NotifyRegression: false,
+				NotifyEveryFail: true,
+				NotifyBackToNorm:false,	
+				NotifyFirstFailureOnly: false,
+				IncludeTestSummary: true				
+			 ]
+	
+	]
+// END TEMP FOR TESTING
+
+/*
+node{
+ label 'built-in'
+
+}
+*/
+
+pipeline {
+    agent{
+		node {
+            	label 'built-in'
+    		}
+	}
+
+    stages {
+        stage('Start') {
+            steps {
+                echo "Starting slack attach Pipeline! This should be run on master."
+		    echo "NODE_NAME = ${env.NODE_NAME}"
+            }
+        }
+        
+	  stage('Get triggering build and Upload its Console Log') {
+
+
+		steps {
+
+				dir(JENKINS_HOME){
+					slackUploadFile(channel: "#athens-jenkins-notifications-secondary", 
+						filePath: "\\jobs\\Athens-Reporting-Pipeline\\builds\\53\\log", 
+						credentialId: 'jenkinsAthensTantalus',
+						initialComment: 'Test File'
+					)
+				}
+
+/*	 	
+			slackSend( channel: channelString,
+		 		color: 'bad',
+		 		message: """example builds log path is here!""",
+		 		tokenCredentialId: 'jenkinsAthensTantalus',
+				teamDomain: 'tantalus-group'
+			)
+			slackUploadFile(channel: channelString, 
+				filePath: "D:/Jenkins/jobs/${JOB_NAME}/builds/${BUILD_NUMBER}/log.txt", 
+				credentialId: 'jenkinsAthensTantalus',
+				initialComment: 'Test File'
+			)
+*/
+
+
+
+		}
+	  }
+
+
+
+        stage('Finish') {
+            steps {
+                echo "Finish reporting pipeline!"
+            }
+        }
+    }
+
+}
+

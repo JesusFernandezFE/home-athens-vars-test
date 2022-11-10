@@ -1,0 +1,36 @@
+// These params determine all variable pipeline functionality, eg: which Stream to sync, which build configs 
+// to build, which pre- and post-build scripts to run, which tests to run after a successful build, etc
+
+def params = [
+	// --- Mandatory params: --- (these MUST be included and set for every pipeline) 
+	target: 'Athens\\athens',
+	workspace: 'BuildFarm_MEL1-BM-001_Athens_Shared',
+	stream: 'toolsdev',
+	configs: ['Debug', 'Playtest', 'Final'],
+	platforms: ['Steam', 'MSIXVC'],
+	
+	// --- Optional params: --- (if not included, these params default to 'false')
+
+	runPreBuildScripts: 	[:],
+	runPostBuildScripts: 	[:],
+	
+	runSlackReporting: true,
+	slackParams: [	
+				Channel: '#athens-jenkins-notifications',
+				NotifySuccess: true,
+				NotifyAborted: false,
+				NotifyNotBuilt: false,
+				NotifyUnstable: false,
+				NotifyRegression: true,
+				NotifyEveryFail: true,
+				NotifyBackToNorm:false,	
+				NotifyFirstFailureOnly: false,
+				IncludeTestSummary: true				
+			 ]
+	
+]
+
+// The following library function runs the actual pipeline, stepping through each stage and 
+// executing any functionality determined by the pipeline params (declared above)
+
+runPipeline(params);

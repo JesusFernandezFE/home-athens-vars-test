@@ -1,0 +1,166 @@
+
+import static athens.utils.GlobalParams.*
+import static athens.utils.UtilityFunctions.*
+
+
+// CYPHTODO: TEMP PARAMS FOR TESTING BEFORE MOVING THIS INTO LIVE CODE
+def params = [
+	workspace: 'BuildFarm_MEL1-BM-001_Athens_Development',
+	stream: 'development',
+	targets: [	
+				[
+					target: 'Athens\\athens',
+					configs: ['Playtest'],
+					platforms: ['Steam'],	
+					runScriptsForThisTarget: true,					  
+				],
+				[
+					target: 'Tools\\TMExport',
+					configs: ['Playtest'],
+					platforms: ['Steam'],						  
+				],
+			],
+
+	// --- Optional params: --- (if not included, these params default to 'false')
+
+	runPreBuildScripts: 	[
+								fullClean: true
+							],
+		
+	runPostBuildScripts: 	[
+								runStabilityTest: ['Steam', 'Playtest'],
+								runTestHarnessTests: ['Steam', 'Playtest'],								
+								buildTextureCache: true,
+								buildModelCache: true,
+								copyBuildFilesToOutDir: true,								
+								packageBuild: true,
+								signExecutables: true,
+								uploadBuildToSteamConfig: "Playtest",
+								uploadBuildToMSStore: false,
+								uploadArtifacts: true
+							],
+
+	runTestHarnessTestSets: [ 'BasicCheckInTestSet' ],
+	testHarnessParams:  [
+							AbortOnTestSetFormatError: false,
+							AbortOnFirstTestFail: false,
+							ShowTestHarnessDebugPrints: true
+						],
+
+	runSlackReporting: true,
+	slackParams: [	
+				Channel: '#athens-jenkins-notifications-secondary',
+				NotifySuccess: true,
+				NotifyAborted: false,
+				NotifyNotBuilt: false,
+				NotifyUnstable: false,
+				NotifyRegression: false,
+				NotifyEveryFail: true,
+				NotifyBackToNorm:false,	
+				NotifyFirstFailureOnly: false,
+				IncludeTestSummary: true				
+			 ]
+	
+	]
+// END TEMP FOR TESTING
+
+
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Start') {
+            steps {
+                echo "Starting Cyph's Test Pipeline!"
+            }
+        }
+        
+		stage('Init Global Params') {
+			steps {	
+				script {
+					
+					//checkAndInitGlobalParams(params)
+					cyphTestScript(params)
+				}
+			}
+		}
+
+		stage('Test Build Requred (TRUE)') {
+//			when { environment(name: "PIPELINE_REQUIRES_BUILD_STEPS", value: "true") }
+			when { expression { return PIPELINE_REQUIRES_BUILD_STEPS } }
+			steps {
+				script {
+					echo "> > > Build step was required, so doing things!"											
+				}
+			}
+		}
+
+		stage('Test Build Requred (FALSE)') {
+//			when { environment(name: "PIPELINE_REQUIRES_BUILD_STEPS", value: "false") }
+			when { expression { return !PIPELINE_REQUIRES_BUILD_STEPS } }
+			steps {
+				script {
+					echo "> > > Build step was NOT required, so NOT doing anything!"											
+				}
+			}
+		}
+
+        stage('Debug Print Globals') {
+            steps {
+				script {
+					PrintGlobalParams()
+					echo "> > > Testing global params: P4_WORKSPACE : '${P4_WORKSPACE}'"
+				}
+			}
+        }
+		
+/*		
+        stage('Run Test Script (Set and Print)') {
+            steps {
+				cyphTestScript(params, true)
+			}
+        }
+
+        stage('Run Test Script (just Print)') {
+            steps {
+				cyphTestScript(params, false)
+
+			}
+        }
+*/
+	  stage('break everything intentionally')
+	  {
+		steps {
+			script {
+			
+				echo "> > > Divide by zero error intentionally caused here - KABOOM!  KER-ASH!  SPLAT!!!"				
+				def abc = 1
+				def abcd = 1/0
+			}
+		}
+	  }
+
+
+
+        stage('Finish') {
+            steps {
+                echo "Finishing Cyph's Test Pipeline!"
+            }
+        }
+    }
+    post {
+			success {
+				runSlackReports(params,'success')
+			}
+			regression
+			{
+				runSlackReports(params,'regression')
+			}
+			failure {
+				runSlackReports(params,'fail')
+			}
+   }
+
+}
+
