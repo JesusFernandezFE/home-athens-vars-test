@@ -35,18 +35,18 @@ def call(Map params) {
 				}
 			}
 
-			stage('P4 Sync') {
-				when { expression { return PIPELINE_REQUIRES_BUILD_STEPS } }
-				steps {	
-					syncPerforceStream(params);
-				}
-			}
+			// stage('P4 Sync') {
+			// 	when { expression { return PIPELINE_REQUIRES_BUILD_STEPS } }
+			// 	steps {	
+			// 		syncPerforceStream(params);
+			// 	}
+			// }
 
-			stage('Run Pre-Build Scripts') {
-				steps {
-					runPreBuildScripts(params);
-				}
-			}
+			// stage('Run Pre-Build Scripts') {
+			// 	steps {
+			// 		runPreBuildScripts(params);
+			// 	}
+			// }
 
 			// stage('Generate VS Projects') {
 			// 	when { expression { return PIPELINE_REQUIRES_BUILD_STEPS } }

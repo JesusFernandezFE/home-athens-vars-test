@@ -28,7 +28,7 @@ def buildTextureCache()
 							Set-ItemProperty -Path "E:\\Athens\\Game\\Data\\streamingdata\\*.*" -Name IsReadOnly -Value \$false
 
 							Write-Host "Building texture cache"
-							cmd.exe /c "E:\\Athens\\scripts\\BuildScripts\\BuildTextureCache.bat" -enviro "E:\\Athens\\"
+							cmd.exe /c "E:\\Athens\\scripts\\BuildScripts\\BuildTextureCache.bat" -projectroot "E:\\Athens"
 
 							Write-Host "Setting streaming data back to read only"
 							Set-ItemProperty -Path "E:\\Athens\\Game\\Data\\streamingdata\\*.*" -Name IsReadOnly -Value \$true
